@@ -161,4 +161,4 @@ def get_weather():
 if __name__ == '__main__':
     print("\n🌤️  Weather App - Open-Meteo Edition")
     print("No API key required! Starting server...\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

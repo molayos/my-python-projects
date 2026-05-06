@@ -35,7 +35,7 @@ async def calculate(request: CalculationRequest):
         
         result = eval(request.expression, {"__builtins__": {}}, allowed_names)
         
-        return  CalculationResponse(
+        return CalculationResponse(
             result=float(result),
             expression=request.expression
         )
