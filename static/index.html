@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .calculator h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .display {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .expression {
+            color: #999;
+            font-size: 14px;
+            min-height: 20px;
+            margin-bottom: 10px;
+        }
+
+        .result {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 40px;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .number, .decimal {
+            background: #ecf0f1;
+            color: #333;
+        }
+
+        .operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .equals {
+            background: #27ae60;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .clear {
+            background: #e74c3c;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .function {
+            background: #3498db;
+            color: white;
+            font-size: 12px;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        .input-area input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-family: monospace;
+        }
+
+        .input-area input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Calculator</h1>
+        
+        <div class="display">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
+            <div class="error" id="error"></div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="expressionInput" placeholder="Enter expression (e.g., 5 + 3 * 2)" />
+        </div>
+
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">Clear</button>
+            <button class="operator" onclick="appendOperator('/')">/</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+
+            <button class="number" onclick="appendNumber('7')">7</button>
+            <button class="number" onclick="appendNumber('8')">8</button>
+            <button class="number" onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('-')">−</button>
+
+            <button class="number" onclick="appendNumber('4')">4</button>
+            <button class="number" onclick="appendNumber('5')">5</button>
+            <button class="number" onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+
+            <button class="number" onclick="appendNumber('1')">1</button>
+            <button class="number" onclick="appendNumber('2')">2</button>
+            <button class="number" onclick="appendNumber('3')">3</button>
+            <button class="function" onclick="appendFunction('sqrt')">√</button>
+
+            <button class="number" onclick="appendNumber('0')">0</button>
+            <button class="decimal" onclick="appendNumber('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+
+            <button class="function" onclick="appendFunction('sin')">sin</button>
+            <button class="function" onclick="appendFunction('cos')">cos</button>
+            <button class="function" onclick="appendFunction('tan')">tan</button>
+            <button class="function" onclick="appendNumber('(')">( )</button>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        let expression = '';
+        const resultElement = document.getElementById('result');
+        const expressionElement = document.getElementById('expression');
+        const errorElement = document.getElementById('error');
+        const statusElement = document.getElementById('status');
+        const expressionInput = document.getElementById('expressionInput');
+
+        function appendNumber(num) {
+            expression += num;
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (expression && !expression.endsWith(' ')) {
+                expression += ' ' + op + ' ';
+            }
+            updateDisplay();
+        }
+
+        function appendFunction(func) {
+            expression += func + '(';
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            expression = '';
+            resultElement.textContent = '0';
+            expressionElement.textContent = '';
+            errorElement.textContent = '';
+            expressionInput.value = '';
+            statusElement.textContent = '';
+        }
+
+        function updateDisplay() {
+            expressionElement.textContent = expression;
+            expressionInput.value = expression;
+        }
+
+        async function calculate() {
+            if (!expression.trim()) return;
+
+            errorElement.textContent = '';
+            statusElement.textContent = 'Calculating...';
+
+            try {
+                const response = await fetch('/api/calc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ expression: expression })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Calculation error');
+                }
+
+                resultElement.textContent = formatNumber(data.result);
+                errorElement.textContent = '';
+                statusElement.textContent = 'Result calculated';
+            } catch (error) {
+                errorElement.textContent = 'Error: ' + error.message;
+                resultElement.textContent = '0';
+                statusElement.textContent = 'Error occurred';
+            }
+        }
+
+        function formatNumber(num) {
+            if (Number.isInteger(num)) {
+                return num.toString();
+            }
+            return parseFloat(num.toPrecision(12)).toString();
+        }
+
+        // Handle Enter key
+        expressionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+
+        // Sync input with expression
+        expressionInput.addEventListener('input', (e) => {
+            expression = e.target.value;
+            expressionElement.textContent = expression;
+        });
+    </script>
+</body>
+</html>
