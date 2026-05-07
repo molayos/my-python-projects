@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 from datetime import datetime
-
+import os
 app = Flask(__name__, template_folder='weather_templates')
 GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 WEATHER_URL = 'https://api.open-meteo.com/v1/forecast'
